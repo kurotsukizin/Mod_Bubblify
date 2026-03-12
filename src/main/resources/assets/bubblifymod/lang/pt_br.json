@@ -1,0 +1,11 @@
+{
+  "_comment": "Keys",
+  "key.bubblifymod.color_menu": "Menu Bubble Chat",
+  "category.bubblifymod.keys": "Bubblify",
+  "gui.bubblifymod.color_picker.title": "Personalize Seu Bubble Chat",
+  "gui.bubblifymod.color_picker.red" : "§cVermelho: ",
+  "gui.bubblifymod.color_picker.green" : "§aVerde: ",
+  "gui.bubblifymod.color_picker.blue" : "§9Azul: ",
+  "gui.bubblifymod.color_picker.confirmed" : "§lConfirme Sua Cor: ",
+  "gui.bubblifymod.color_picker.choose" : "Sua Cor: "
+}
