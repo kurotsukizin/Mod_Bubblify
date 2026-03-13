@@ -6,6 +6,7 @@ Bubblify transforms how players communicate in Minecraft. Originally designed to
 
 Whenever a player types something in the chat, the message appears in a stylish floating “speech bubble” directly above their head, making group conversations, camp events, and town interactions much more organic and visual.
 
+<img width="680" height="694" alt="image" src="https://github.com/user-attachments/assets/6972eb17-8b27-4b48-a2eb-28437402306e" />
 
 
 ⊰══════════⊱
@@ -21,6 +22,7 @@ RGB Color Picker: Every player is unique! Bubblify features a modern and intuiti
 
 Smart Memory (Client-Side Saving): Thanks to an optimized configuration system, the color chosen by the player is saved locally on their computer. You can close the game and come back the next day: your chat color will remain exactly as you left it!
 
+<img width="739" height="892" alt="image" src="https://github.com/user-attachments/assets/826c6ffe-5585-4615-ab46-337d6cbb0a0b" />
 
 
 ⊰══════════⊱
@@ -46,3 +48,4 @@ Required: Requires the mod to be installed on both the Client side (to render th
 
 
 ⊰══════════⊱
+
