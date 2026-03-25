@@ -28,7 +28,6 @@ public class ServerChatEvents {
 
         ModMessages.sendToAllPlayers(new BubbleMessagePacket(player.getUUID(), message, playerColor));
 
-        event.setCanceled(true);
     }
 
     @SubscribeEvent

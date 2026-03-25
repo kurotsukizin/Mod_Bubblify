@@ -1,6 +1,7 @@
 package net.bubblify.mod;
 
 import com.mojang.logging.LogUtils;
+import net.bubblify.mod.event.ChatEventHandler;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
@@ -34,7 +35,10 @@ public class BubblifyMod {
 
         modEventBus.addListener(this::addCreative);
 
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, BubblifyServerConfig.SPEC);
+
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, BubblifyConfig.SPEC);
+
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)

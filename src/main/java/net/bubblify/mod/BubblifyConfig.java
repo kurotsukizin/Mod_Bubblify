@@ -13,7 +13,6 @@ public class BubblifyConfig {
     static {
         BUILDER.push("Configuracoes_do_Bubble_Chat");
 
-        // Define a cor vermelha (O padrão é 255, mínimo 0, máximo 255)
         RED = BUILDER.comment("Cor Vermelha do Chat")
                 .defineInRange("cor_vermelha", 255, 0, 255);
 
