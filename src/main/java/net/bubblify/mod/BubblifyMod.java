@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 
 //daqui para baixo é só loucura 0-0
 
+@SuppressWarnings("removal")
 @Mod(BubblifyMod.MOD_ID)
 public class BubblifyMod {
 

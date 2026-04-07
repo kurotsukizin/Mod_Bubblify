@@ -7,5 +7,6 @@
   "gui.bubblifymod.color_picker.green" : "§aVerde: ",
   "gui.bubblifymod.color_picker.blue" : "§9Azul: ",
   "gui.bubblifymod.color_picker.confirmed" : "§lConfirme Sua Cor: ",
-  "gui.bubblifymod.color_picker.choose" : "Sua Cor: "
+  "gui.bubblifymod.color_picker.choose" : "Sua Cor: ",
+  "gui.bubblifymod.color_picker.text_color" : "Cor do Texto"
 }

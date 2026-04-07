@@ -7,6 +7,7 @@
   "gui.bubblifymod.color_picker.green" : "§aGreen: ",
   "gui.bubblifymod.color_picker.blue" : "§9Blue: ",
   "gui.bubblifymod.color_picker.confirmed" : "§lConfirm Your Color: ",
-  "gui.bubblifymod.color_picker.choose" : "Your Color: "
+  "gui.bubblifymod.color_picker.choose" : "Your Color: ",
+  "gui.bubblifymod.color_picker.text_color" : "Text Color"
 }
 

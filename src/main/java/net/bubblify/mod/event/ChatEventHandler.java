@@ -15,8 +15,6 @@ public class ChatEventHandler {
 
         boolean mostrarChat = BubblifyServerConfig.SHOW_CHAT.get();
 
-        System.out.println("[BUBBLIFY DEBUG] O Cliente acha que mostrarChat é: " + mostrarChat);
-
         if (!mostrarChat) {
             if (!event.isSystem()) {
                 event.setCanceled(true);

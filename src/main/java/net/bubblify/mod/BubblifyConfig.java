@@ -9,6 +9,7 @@ public class BubblifyConfig {
     public static final ForgeConfigSpec.IntValue RED;
     public static final ForgeConfigSpec.IntValue GREEN;
     public static final ForgeConfigSpec.IntValue BLUE;
+    public static final ForgeConfigSpec.BooleanValue TEXTO_BRANCO;
 
     static {
         BUILDER.push("Configuracoes_do_Bubble_Chat");
@@ -21,6 +22,9 @@ public class BubblifyConfig {
 
         BLUE = BUILDER.comment("Cor Azul do Chat")
                 .defineInRange("cor_azul", 255, 0, 255);
+
+        TEXTO_BRANCO = BUILDER.comment("Define se a cor do texto na bolha será branca (true) ou preta (false)")
+                .define("texto_branco", true);
 
         BUILDER.pop();
         SPEC = BUILDER.build();

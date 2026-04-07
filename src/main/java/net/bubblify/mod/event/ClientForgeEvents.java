@@ -87,7 +87,11 @@ public class ClientForgeEvents {
 
                 int bgColor = 0xAA000000 | (bubble.color & 0xFFFFFF);
 
-                font.drawInBatch(bubble.text, xOffset, bubble.currentYOffset, 0xFFFFFF, false, matrix4f, event.getMultiBufferSource(), Font.DisplayMode.NORMAL, bgColor, light);
+                boolean textoBranco = net.bubblify.mod.BubblifyConfig.TEXTO_BRANCO.get();
+
+                int corDoTexto = textoBranco ? 0xFFFFFF : 0x000000;
+
+                font.drawInBatch(bubble.text, xOffset, bubble.currentYOffset, corDoTexto, false, matrix4f, event.getMultiBufferSource(), Font.DisplayMode.NORMAL, bgColor, light);
             }
 
             poseStack.popPose();
