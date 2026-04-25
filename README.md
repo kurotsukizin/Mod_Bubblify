@@ -6,6 +6,7 @@ Bubblify transforms how players communicate in Minecraft. Originally designed to
 
 Whenever a player types something in the chat, the message appears in a stylish floating “speech bubble” directly above their head, making group conversations, camp events, and town interactions much more organic and visual.
 
+<img width="680" height="694" alt="image" src="https://github.com/user-attachments/assets/e958624b-7a01-45d5-a06b-c51249f9a043" />
 
 
 ### ⊰══════════⊱
@@ -58,7 +59,7 @@ For server owners who want to push immersion to the maximum, Bubblify offers a b
 
 This completely hides the standard Vanilla chat on the bottom left corner for all players! Communication becomes strictly visual and local through the floating bubbles, completely changing the dynamic of the server. (Can be easily reverted at any time using true).
 
-
+<img width="559" height="160" alt="image" src="https://github.com/user-attachments/assets/8d6234b8-8026-44dd-859c-1b720c8b8862" />
 
 ### ⊰══════════⊱
 
