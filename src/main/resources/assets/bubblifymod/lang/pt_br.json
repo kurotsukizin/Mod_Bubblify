@@ -8,5 +8,8 @@
   "gui.bubblifymod.color_picker.blue" : "§9Azul: ",
   "gui.bubblifymod.color_picker.confirmed" : "§lConfirme Sua Cor: ",
   "gui.bubblifymod.color_picker.choose" : "Sua Cor: ",
-  "gui.bubblifymod.color_picker.text_color" : "Cor do Texto"
+  "gui.bubblifymod.color_picker.text_color" : "Cor do Texto",
+  "commands.bubblifymod.class.success": "§e[Bubblify] A classe do jogador %s foi definida como: §b%s",
+  "commands.bubblifymod.class.cleared": "§a[Bubblify] A classe do jogador %s foi removida. Ele voltou a ser um jogador normal.",
+  "commands.bubblifymod.show_chat.success": "§a[Bubblify] O chat padrão agora está definido como: %s"
 }
