@@ -5,9 +5,9 @@ import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.bubblify.mod.config.BubblifyClientConfig;
 import net.bubblify.mod.network.ModMessages;
 import net.bubblify.mod.network.UpdateColorPacket;
-import net.bubblify.mod.BubblifyConfig;
 
 public class ColorPickerScreen extends Screen {
 
@@ -27,11 +27,11 @@ public class ColorPickerScreen extends Screen {
     protected void init() {
         super.init();
 
-        this.red = BubblifyConfig.RED.get() / 255.0F;
-        this.green = BubblifyConfig.GREEN.get() / 255.0F;
-        this.blue = BubblifyConfig.BLUE.get() / 255.0F;
+        this.red = BubblifyClientConfig.RED.get() / 255.0F;
+        this.green = BubblifyClientConfig.GREEN.get() / 255.0F;
+        this.blue = BubblifyClientConfig.BLUE.get() / 255.0F;
 
-        this.isTextWhite = BubblifyConfig.TEXTO_BRANCO.get();
+        this.isTextWhite = BubblifyClientConfig.TEXTO_BRANCO.get();
 
         updateColorPreview();
 
@@ -42,10 +42,12 @@ public class ColorPickerScreen extends Screen {
             {
                 this.updateMessage();
             }
+
             @Override
             protected void updateMessage() {
-                this.setMessage(Component.translatable("gui.bubblifymod.color_picker.red").append(": " + (int)(this.value * 255)));
+                this.setMessage(Component.translatable("gui.bubblifymod.color_picker.red").append(": ").append(String.valueOf((int) (this.value * 255))));
             }
+
             @Override
             protected void applyValue() {
                 red = (float) this.value;
@@ -57,10 +59,12 @@ public class ColorPickerScreen extends Screen {
             {
                 this.updateMessage();
             }
+
             @Override
             protected void updateMessage() {
-                this.setMessage(Component.translatable("gui.bubblifymod.color_picker.green").append(": " + (int)(this.value * 255)));
+                this.setMessage(Component.translatable("gui.bubblifymod.color_picker.green").append(": ").append(String.valueOf((int) (this.value * 255))));
             }
+
             @Override
             protected void applyValue() {
                 green = (float) this.value;
@@ -72,10 +76,12 @@ public class ColorPickerScreen extends Screen {
             {
                 this.updateMessage();
             }
+
             @Override
             protected void updateMessage() {
-                this.setMessage(Component.translatable("gui.bubblifymod.color_picker.blue").append(": " + (int)(this.value * 255)));
+                this.setMessage(Component.translatable("gui.bubblifymod.color_picker.blue").append(": ").append(String.valueOf((int) (this.value * 255))));
             }
+
             @Override
             protected void applyValue() {
                 blue = (float) this.value;
@@ -85,7 +91,10 @@ public class ColorPickerScreen extends Screen {
 
         this.addRenderableWidget(Button.builder(Component.translatable("gui.bubblifymod.color_picker.confirmed"), button -> {
             salvarConfiguracao();
-            ModMessages.sendToServer(new UpdateColorPacket(this.currentColor));
+
+            int sanitizedColor = this.currentColor & 0xFFFFFF;
+            ModMessages.sendToServer(new UpdateColorPacket(sanitizedColor));
+
             this.minecraft.setScreen(null);
         }).bounds(centerX - 50, startY + 115, 100, 20).build());
     }
@@ -97,17 +106,15 @@ public class ColorPickerScreen extends Screen {
         this.currentColor = (r << 16) | (g << 8) | b;
     }
 
-
     private void salvarConfiguracao() {
-        BubblifyConfig.RED.set((int) (this.red * 255));
-        BubblifyConfig.GREEN.set((int) (this.green * 255));
-        BubblifyConfig.BLUE.set((int) (this.blue * 255));
+        BubblifyClientConfig.RED.set((int) (this.red * 255));
+        BubblifyClientConfig.GREEN.set((int) (this.green * 255));
+        BubblifyClientConfig.BLUE.set((int) (this.blue * 255));
 
-        BubblifyConfig.TEXTO_BRANCO.set(this.isTextWhite);
+        BubblifyClientConfig.TEXTO_BRANCO.set(this.isTextWhite);
 
-        BubblifyConfig.SPEC.save();
+        BubblifyClientConfig.SPEC.save();
     }
-
 
     @Override
     public void onClose() {
@@ -122,7 +129,6 @@ public class ColorPickerScreen extends Screen {
         int painelEsquerdoY = startY + 25;
 
         if (button == 0) {
-
             if (mouseX >= leftX - 25 && mouseX <= leftX - 5 && mouseY >= painelEsquerdoY && mouseY <= painelEsquerdoY + 20) {
                 this.isTextWhite = false;
                 return true;
@@ -149,9 +155,8 @@ public class ColorPickerScreen extends Screen {
         graphics.drawCenteredString(this.font, Component.translatable("gui.bubblifymod.color_picker.choose"), centerX, previewY - 15, 0xAAAAAA);
 
         int boxSize = 40;
-        graphics.fill(centerX - boxSize/2 - 2, previewY - 2, centerX + boxSize/2 + 2, previewY + boxSize + 2, 0xFF000000);
-        graphics.fill(centerX - boxSize/2, previewY, centerX + boxSize/2, previewY + boxSize, 0xFF000000 | this.currentColor);
-
+        graphics.fill(centerX - boxSize / 2 - 2, previewY - 2, centerX + boxSize / 2 + 2, previewY + boxSize + 2, 0xFF000000);
+        graphics.fill(centerX - boxSize / 2, previewY, centerX + boxSize / 2, previewY + boxSize, 0xFF000000 | this.currentColor);
 
         int leftX = this.width / 6;
         int painelEsquerdoY = startY + 25;
@@ -161,7 +166,7 @@ public class ColorPickerScreen extends Screen {
 
         graphics.fill(leftX + 5, painelEsquerdoY, leftX + 25, painelEsquerdoY + 20, 0xFFFFFFFF);
 
-        int corDestaque = 0xFF00FF00; // Verde
+        int corDestaque = 0xFF00FF00;
         if (!this.isTextWhite) {
             graphics.renderOutline(leftX - 26, painelEsquerdoY - 1, 22, 22, corDestaque);
         } else {

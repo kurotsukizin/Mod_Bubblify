@@ -1,9 +1,9 @@
 package net.bubblify.mod.network;
 
+import net.bubblify.mod.event.ServerChatEvents;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
-import net.bubblify.mod.event.ServerChatEvents;
 
 import java.util.function.Supplier;
 
@@ -27,9 +27,11 @@ public class UpdateColorPacket {
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
             if (player != null) {
-                net.bubblify.mod.event.ServerChatEvents.PLAYER_COLORS.put(player.getUUID(), color);
+                int sanitizedColor = color & 0xFFFFFF;
 
-                player.getPersistentData().putInt("bubblify_chat_color", color);
+                ServerChatEvents.PLAYER_COLORS.put(player.getUUID(), sanitizedColor);
+
+                player.getPersistentData().putInt("bubblify_chat_color", sanitizedColor);
             }
         });
         context.setPacketHandled(true);
