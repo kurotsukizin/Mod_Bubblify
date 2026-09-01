@@ -7,7 +7,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.bubblify.mod.BubblifyMod;
-import net.bubblify.mod.config.BubblifyClientConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.GameRenderer;
@@ -41,32 +40,51 @@ public class ClientForgeEvents {
     private static final float BUBBLE_SPACING = 14.0F;
     private static final float BUBBLE_HEIGHT_OFFSET = 0.8F;
 
+    public static final Map<UUID, List<ChatBubble>> ACTIVE_BUBBLES =
+            new HashMap<>();
+
     public static class ChatBubble {
+
         public final String text;
         public final int color;
+
+        /*
+         * true  = white text
+         * false = black text
+         *
+         * This value belongs to the player who sent the chat message.
+         */
+        public final boolean textoBranco;
+
         public int ticksRemaining;
         public float currentYOffset;
 
-        public ChatBubble(String text, int color) {
+        public ChatBubble(
+                String text,
+                int color,
+                boolean textoBranco
+        ) {
             this.text = text;
             this.color = color & 0xFFFFFF;
+            this.textoBranco = textoBranco;
             this.ticksRemaining = BUBBLE_LIFETIME_TICKS;
             this.currentYOffset = 0.0F;
         }
     }
 
-    public static final Map<UUID, List<ChatBubble>> ACTIVE_BUBBLES = new HashMap<>();
-
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END || Minecraft.getInstance().level == null) {
+        if (event.phase != TickEvent.Phase.END
+                || Minecraft.getInstance().level == null) {
             return;
         }
 
-        Iterator<Map.Entry<UUID, List<ChatBubble>>> iterator = ACTIVE_BUBBLES.entrySet().iterator();
+        Iterator<Map.Entry<UUID, List<ChatBubble>>> iterator =
+                ACTIVE_BUBBLES.entrySet().iterator();
 
         while (iterator.hasNext()) {
             List<ChatBubble> bubbles = iterator.next().getValue();
+
             bubbles.removeIf(bubble -> --bubble.ticksRemaining <= 0);
 
             if (bubbles.isEmpty()) {
@@ -77,34 +95,55 @@ public class ClientForgeEvents {
 
     @SubscribeEvent
     public static void onRenderLevel(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
+        if (event.getStage()
+                != RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
             return;
         }
 
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.level == null || minecraft.player == null) {
+
+        if (minecraft.level == null
+                || minecraft.player == null
+                || ACTIVE_BUBBLES.isEmpty()) {
             return;
         }
 
         PoseStack poseStack = event.getPoseStack();
-        MultiBufferSource.BufferSource bufferSource = minecraft.renderBuffers().bufferSource();
+
+        MultiBufferSource.BufferSource bufferSource =
+                minecraft.renderBuffers().bufferSource();
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
+
+        /*
+         * The bubble is intentionally rendered above entities,
+         * blocks and particles.
+         */
         RenderSystem.disableDepthTest();
         RenderSystem.depthMask(false);
 
         try {
-            for (Map.Entry<UUID, List<ChatBubble>> entry : ACTIVE_BUBBLES.entrySet()) {
+            for (Map.Entry<UUID, List<ChatBubble>> entry
+                    : ACTIVE_BUBBLES.entrySet()) {
+
                 Player player = findPlayer(entry.getKey());
 
                 if (player == null || entry.getValue().isEmpty()) {
                     continue;
                 }
 
-                double x = player.xOld + (player.getX() - player.xOld) * event.getPartialTick();
-                double y = player.yo + (player.getY() - player.yo) * event.getPartialTick();
-                double z = player.zOld + (player.getZ() - player.zOld) * event.getPartialTick();
+                double x = player.xOld
+                        + (player.getX() - player.xOld)
+                        * event.getPartialTick();
+
+                double y = player.yo
+                        + (player.getY() - player.yo)
+                        * event.getPartialTick();
+
+                double z = player.zOld
+                        + (player.getZ() - player.zOld)
+                        * event.getPartialTick();
 
                 renderBubbleAt(
                         player,
@@ -117,9 +156,17 @@ public class ClientForgeEvents {
                 );
             }
 
+            /*
+             * This is valid because bufferSource is explicitly
+             * MultiBufferSource.BufferSource.
+             */
             bufferSource.endBatch();
 
         } finally {
+            /*
+             * Restore Minecraft's rendering state even if another
+             * error happens while a bubble is being rendered.
+             */
             RenderSystem.depthMask(true);
             RenderSystem.enableDepthTest();
             RenderSystem.disableBlend();
@@ -128,6 +175,7 @@ public class ClientForgeEvents {
 
     private static Player findPlayer(UUID uuid) {
         Minecraft minecraft = Minecraft.getInstance();
+
         if (minecraft.level == null) {
             return null;
         }
@@ -151,31 +199,63 @@ public class ClientForgeEvents {
             List<ChatBubble> bubbles
     ) {
         Minecraft minecraft = Minecraft.getInstance();
+
         Font font = minecraft.font;
-        EntityRenderDispatcher dispatcher = minecraft.getEntityRenderDispatcher();
+
+        EntityRenderDispatcher dispatcher =
+                minecraft.getEntityRenderDispatcher();
 
         double cameraX = dispatcher.camera.getPosition().x();
         double cameraY = dispatcher.camera.getPosition().y();
         double cameraZ = dispatcher.camera.getPosition().z();
 
         poseStack.pushPose();
-        poseStack.translate(x - cameraX, y - cameraY + player.getBbHeight() + BUBBLE_HEIGHT_OFFSET, z - cameraZ);
+
+        poseStack.translate(
+                x - cameraX,
+                y - cameraY
+                        + player.getBbHeight()
+                        + BUBBLE_HEIGHT_OFFSET,
+                z - cameraZ
+        );
+
         poseStack.mulPose(dispatcher.cameraOrientation());
-        poseStack.scale(-BUBBLE_SCALE, -BUBBLE_SCALE, BUBBLE_SCALE);
+
+        poseStack.scale(
+                -BUBBLE_SCALE,
+                -BUBBLE_SCALE,
+                BUBBLE_SCALE
+        );
 
         Matrix4f matrix = poseStack.last().pose();
-        int textColor = BubblifyClientConfig.TEXTO_BRANCO.get() ? 0xFFFFFF : 0x000000;
 
         for (int index = 0; index < bubbles.size(); index++) {
             ChatBubble bubble = bubbles.get(index);
 
             int reverseIndex = bubbles.size() - 1 - index;
-            float targetYOffset = -(reverseIndex * BUBBLE_SPACING);
-            bubble.currentYOffset += (targetYOffset - bubble.currentYOffset) * 0.15F;
+
+            float targetYOffset =
+                    -(reverseIndex * BUBBLE_SPACING);
+
+            bubble.currentYOffset +=
+                    (targetYOffset - bubble.currentYOffset) * 0.15F;
 
             int textWidth = font.width(bubble.text);
+
             float bubbleX = -textWidth / 2.0F;
             float bubbleY = bubble.currentYOffset;
+
+            int backgroundColor =
+                    0xCC000000 | bubble.color;
+
+            int borderColor = 0xFF000000;
+
+            /*
+             * The text color is defined by the sender of the message.
+             */
+            int textColor = bubble.textoBranco
+                    ? 0xFFFFFF
+                    : 0x000000;
 
             drawRoundedBalloon(
                     matrix,
@@ -183,8 +263,8 @@ public class ClientForgeEvents {
                     bubbleY,
                     textWidth,
                     9,
-                    0xCC000000 | bubble.color,
-                    0xFF000000
+                    backgroundColor,
+                    borderColor
             );
 
             font.drawInBatch(
@@ -222,26 +302,174 @@ public class ClientForgeEvents {
 
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder builder = tesselator.getBuilder();
-        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 
-        addQuad(builder, matrix, left + 2, top - 1, right - 2, bottom + 1, borderColor);
-        addQuad(builder, matrix, left - 1, top + 2, right + 1, bottom - 2, borderColor);
-        addQuad(builder, matrix, left, top, left + 2, top + 2, borderColor);
-        addQuad(builder, matrix, right - 2, top, right, top + 2, borderColor);
-        addQuad(builder, matrix, left, bottom - 2, left + 2, bottom, borderColor);
-        addQuad(builder, matrix, right - 2, bottom - 2, right, bottom, borderColor);
+        builder.begin(
+                VertexFormat.Mode.QUADS,
+                DefaultVertexFormat.POSITION_COLOR
+        );
 
-        addQuad(builder, matrix, left + 2, top, right - 2, bottom, backgroundColor);
-        addQuad(builder, matrix, left, top + 2, right, bottom - 2, backgroundColor);
-        addQuad(builder, matrix, left + 1, top + 1, left + 2, top + 2, backgroundColor);
-        addQuad(builder, matrix, right - 2, top + 1, right - 1, top + 2, backgroundColor);
-        addQuad(builder, matrix, left + 1, bottom - 2, left + 2, bottom - 1, backgroundColor);
-        addQuad(builder, matrix, right - 2, bottom - 2, right - 1, bottom - 1, backgroundColor);
+        // Pixel-style black outer border.
+        addQuad(
+                builder,
+                matrix,
+                left + 2,
+                top - 1,
+                right - 2,
+                bottom + 1,
+                borderColor
+        );
 
-        addQuad(builder, matrix, -3, bottom, 3, bottom + 3, borderColor);
-        addQuad(builder, matrix, -2, bottom + 3, 2, bottom + 4, borderColor);
-        addQuad(builder, matrix, -2, bottom, 2, bottom + 2, backgroundColor);
-        addQuad(builder, matrix, -1, bottom + 2, 1, bottom + 3, backgroundColor);
+        addQuad(
+                builder,
+                matrix,
+                left - 1,
+                top + 2,
+                right + 1,
+                bottom - 2,
+                borderColor
+        );
+
+        addQuad(
+                builder,
+                matrix,
+                left,
+                top,
+                left + 2,
+                top + 2,
+                borderColor
+        );
+
+        addQuad(
+                builder,
+                matrix,
+                right - 2,
+                top,
+                right,
+                top + 2,
+                borderColor
+        );
+
+        addQuad(
+                builder,
+                matrix,
+                left,
+                bottom - 2,
+                left + 2,
+                bottom,
+                borderColor
+        );
+
+        addQuad(
+                builder,
+                matrix,
+                right - 2,
+                bottom - 2,
+                right,
+                bottom,
+                borderColor
+        );
+
+        // Colored inner background.
+        addQuad(
+                builder,
+                matrix,
+                left + 2,
+                top,
+                right - 2,
+                bottom,
+                backgroundColor
+        );
+
+        addQuad(
+                builder,
+                matrix,
+                left,
+                top + 2,
+                right,
+                bottom - 2,
+                backgroundColor
+        );
+
+        addQuad(
+                builder,
+                matrix,
+                left + 1,
+                top + 1,
+                left + 2,
+                top + 2,
+                backgroundColor
+        );
+
+        addQuad(
+                builder,
+                matrix,
+                right - 2,
+                top + 1,
+                right - 1,
+                top + 2,
+                backgroundColor
+        );
+
+        addQuad(
+                builder,
+                matrix,
+                left + 1,
+                bottom - 2,
+                left + 2,
+                bottom - 1,
+                backgroundColor
+        );
+
+        addQuad(
+                builder,
+                matrix,
+                right - 2,
+                bottom - 2,
+                right - 1,
+                bottom - 1,
+                backgroundColor
+        );
+
+        // Speech bubble tail.
+        addQuad(
+                builder,
+                matrix,
+                -3,
+                bottom,
+                3,
+                bottom + 3,
+                borderColor
+        );
+
+        addQuad(
+                builder,
+                matrix,
+                -2,
+                bottom + 3,
+                2,
+                bottom + 4,
+                borderColor
+        );
+
+        addQuad(
+                builder,
+                matrix,
+                -2,
+                bottom,
+                2,
+                bottom + 2,
+                backgroundColor
+        );
+
+        addQuad(
+                builder,
+                matrix,
+                -1,
+                bottom + 2,
+                1,
+                bottom + 3,
+                backgroundColor
+        );
 
         tesselator.end();
     }
@@ -260,15 +488,42 @@ public class ClientForgeEvents {
         int green = (color >> 8) & 0xFF;
         int blue = color & 0xFF;
 
-        builder.vertex(matrix, minX, maxY, 0.01F).color(red, green, blue, alpha).endVertex();
-        builder.vertex(matrix, maxX, maxY, 0.01F).color(red, green, blue, alpha).endVertex();
-        builder.vertex(matrix, maxX, minY, 0.01F).color(red, green, blue, alpha).endVertex();
-        builder.vertex(matrix, minX, minY, 0.01F).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, minX, maxY, 0.01F)
+                .color(red, green, blue, alpha)
+                .endVertex();
+
+        builder.vertex(matrix, maxX, maxY, 0.01F)
+                .color(red, green, blue, alpha)
+                .endVertex();
+
+        builder.vertex(matrix, maxX, minY, 0.01F)
+                .color(red, green, blue, alpha)
+                .endVertex();
+
+        builder.vertex(matrix, minX, minY, 0.01F)
+                .color(red, green, blue, alpha)
+                .endVertex();
     }
 
-    public static void addBubble(UUID playerId, String message, int color) {
-        List<ChatBubble> bubbles = ACTIVE_BUBBLES.computeIfAbsent(playerId, id -> new ArrayList<>());
-        bubbles.add(new ChatBubble(message, color));
+    public static void addBubble(
+            UUID playerId,
+            String message,
+            int color,
+            boolean textoBranco
+    ) {
+        List<ChatBubble> bubbles =
+                ACTIVE_BUBBLES.computeIfAbsent(
+                        playerId,
+                        id -> new ArrayList<>()
+                );
+
+        bubbles.add(
+                new ChatBubble(
+                        message,
+                        color,
+                        textoBranco
+                )
+        );
 
         if (bubbles.size() > MAX_BUBBLES_PER_PLAYER) {
             bubbles.remove(0);
