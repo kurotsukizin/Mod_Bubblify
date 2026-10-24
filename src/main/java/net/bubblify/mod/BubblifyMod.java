@@ -1,5 +1,10 @@
 package net.bubblify.mod;
 
+import com.mojang.logging.LogUtils;
+import net.bubblify.mod.bubble.BubbleStyleRegistry;
+import net.bubblify.mod.network.ModMessages;
+import net.minecraft.client.Minecraft;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
@@ -12,6 +17,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.slf4j.Logger;
 
 @SuppressWarnings("removal")
 @Mod(BubblifyMod.MOD_ID)
@@ -19,11 +25,22 @@ public class BubblifyMod {
 
     public static final String MOD_ID = "bubblifymod";
 
-    public BubblifyMod(FMLJavaModLoadingContext context) {
-        IEventBus modEventBus = context.getModEventBus();
+    public static final Logger LOGGER =
+            LogUtils.getLogger();
 
-        modEventBus.addListener(this::commonSetup);
-        modEventBus.addListener(this::addCreative);
+    public BubblifyMod(
+            FMLJavaModLoadingContext context
+    ) {
+        IEventBus modEventBus =
+                context.getModEventBus();
+
+        modEventBus.addListener(
+                this::commonSetup
+        );
+
+        modEventBus.addListener(
+                this::addCreative
+        );
 
         MinecraftForge.EVENT_BUS.register(this);
 
@@ -38,17 +55,26 @@ public class BubblifyMod {
         );
     }
 
-    private void commonSetup(final FMLCommonSetupEvent event) {
-        event.enqueueWork(
-                net.bubblify.mod.network.ModMessages::register
-        );
+    private void commonSetup(
+            final FMLCommonSetupEvent event
+    ) {
+        event.enqueueWork(() -> {
+
+            BubbleStyleRegistry.registerDefaults();
+
+            ModMessages.register();
+        });
     }
 
-    private void addCreative(BuildCreativeModeTabContentsEvent event) {
+    private void addCreative(
+            BuildCreativeModeTabContentsEvent event
+    ) {
     }
 
     @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
+    public void onServerStarting(
+            ServerStartingEvent event
+    ) {
     }
 
     @Mod.EventBusSubscriber(
@@ -59,7 +85,22 @@ public class BubblifyMod {
     public static class ClientModEvents {
 
         @SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event) {
+        public static void onClientSetup(
+                FMLClientSetupEvent event
+        ) {
+            event.enqueueWork(() -> {
+                Minecraft minecraft =
+                        Minecraft.getInstance();
+
+                ResourceManager resourceManager =
+                        minecraft.getResourceManager();
+
+                BubbleStyleRegistry.registerDefaults();
+
+                BubbleStyleRegistry.discoverAndRegisterStyles(
+                        resourceManager
+                );
+            });
         }
     }
 }

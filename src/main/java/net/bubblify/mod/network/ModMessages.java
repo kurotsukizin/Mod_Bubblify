@@ -31,6 +31,17 @@ public class ModMessages {
                 .encoder(BubbleMessagePacket::toBytes)
                 .consumerMainThread(BubbleMessagePacket::handle)
                 .add();
+
+        net.messageBuilder(
+                        AllowedBubbleStylesPacket.class,
+                        id(),
+                        NetworkDirection.PLAY_TO_CLIENT
+                )
+                .decoder(AllowedBubbleStylesPacket::new)
+                .encoder(AllowedBubbleStylesPacket::toBytes)
+                .consumerMainThread(AllowedBubbleStylesPacket::handle)
+                .add();
+
         net.messageBuilder(UpdateColorPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .decoder(UpdateColorPacket::new)
                 .encoder(UpdateColorPacket::toBytes)
