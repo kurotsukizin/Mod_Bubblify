@@ -17,10 +17,6 @@ public class ColorPickerScreen extends Screen {
     private float green;
     private float blue;
 
-    /*
-     * true  = texto branco
-     * false = texto preto
-     */
     private boolean isTextWhite;
 
     private int currentColor;
@@ -176,17 +172,11 @@ public class ColorPickerScreen extends Screen {
                             int sanitizedColor =
                                     this.currentColor & 0xFFFFFF;
 
-                            /*
-                             * Salva a escolha no cache local da sessão.
-                             */
+
                             savedColor = sanitizedColor;
                             savedTextWhite = this.isTextWhite;
 
-                            /*
-                             * Envia a configuração do jogador ao servidor:
-                             * - Cor RGB da bolha.
-                             * - Cor branca/preta do texto.
-                             */
+            
                             ModMessages.sendToServer(
                                     new UpdateColorPacket(
                                             sanitizedColor,
@@ -220,11 +210,7 @@ public class ColorPickerScreen extends Screen {
 
     @Override
     public void onClose() {
-        /*
-         * Também salva no cache quando a pessoa fecha a tela por ESC.
-         * Isso não envia nada ao servidor: somente confirmar aplica
-         * a mudança global da bolha.
-         */
+
         savedColor = this.currentColor & 0xFFFFFF;
         savedTextWhite = this.isTextWhite;
 
@@ -305,9 +291,6 @@ public class ColorPickerScreen extends Screen {
 
         int boxSize = 40;
 
-        /*
-         * Borda da prévia.
-         */
         graphics.fill(
                 centerX - boxSize / 2 - 2,
                 previewY - 2,
@@ -316,9 +299,6 @@ public class ColorPickerScreen extends Screen {
                 0xFF000000
         );
 
-        /*
-         * Cor atual da bolha.
-         */
         graphics.fill(
                 centerX - boxSize / 2,
                 previewY,
@@ -340,9 +320,7 @@ public class ColorPickerScreen extends Screen {
                 0xFFFFFF
         );
 
-        /*
-         * Opção: texto preto.
-         */
+
         graphics.fill(
                 leftX - 25,
                 textColorY,
@@ -351,9 +329,6 @@ public class ColorPickerScreen extends Screen {
                 0xFF000000
         );
 
-        /*
-         * Opção: texto branco.
-         */
         graphics.fill(
                 leftX + 5,
                 textColorY,
