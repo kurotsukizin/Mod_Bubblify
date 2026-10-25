@@ -48,12 +48,6 @@ public class ClientForgeEvents {
         public final String text;
         public final int color;
 
-        /*
-         * true  = white text
-         * false = black text
-         *
-         * This value belongs to the player who sent the chat message.
-         */
         public final boolean textoBranco;
 
         public int ticksRemaining;
@@ -116,10 +110,6 @@ public class ClientForgeEvents {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 
-        /*
-         * The bubble is intentionally rendered above entities,
-         * blocks and particles.
-         */
         RenderSystem.disableDepthTest();
         RenderSystem.depthMask(false);
 
@@ -156,17 +146,11 @@ public class ClientForgeEvents {
                 );
             }
 
-            /*
-             * This is valid because bufferSource is explicitly
-             * MultiBufferSource.BufferSource.
-             */
+
             bufferSource.endBatch();
 
         } finally {
-            /*
-             * Restore Minecraft's rendering state even if another
-             * error happens while a bubble is being rendered.
-             */
+
             RenderSystem.depthMask(true);
             RenderSystem.enableDepthTest();
             RenderSystem.disableBlend();
@@ -250,9 +234,6 @@ public class ClientForgeEvents {
 
             int borderColor = 0xFF000000;
 
-            /*
-             * The text color is defined by the sender of the message.
-             */
             int textColor = bubble.textoBranco
                     ? 0xFFFFFF
                     : 0x000000;
@@ -308,7 +289,6 @@ public class ClientForgeEvents {
                 DefaultVertexFormat.POSITION_COLOR
         );
 
-        // Pixel-style black outer border.
         addQuad(
                 builder,
                 matrix,
@@ -369,7 +349,6 @@ public class ClientForgeEvents {
                 borderColor
         );
 
-        // Colored inner background.
         addQuad(
                 builder,
                 matrix,
@@ -430,7 +409,6 @@ public class ClientForgeEvents {
                 backgroundColor
         );
 
-        // Speech bubble tail.
         addQuad(
                 builder,
                 matrix,
