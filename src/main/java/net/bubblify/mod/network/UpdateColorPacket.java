@@ -77,10 +77,7 @@ public class UpdateColorPacket {
             ServerPlayer player,
             String requestedStyleId
     ) {
-        /*
-         * Admin com nível 2 ou maior:
-         * pode selecionar qualquer ID válido.
-         */
+
         if (player.hasPermissions(2)) {
             return requestedStyleId;
         }
@@ -90,11 +87,7 @@ public class UpdateColorPacket {
                 .trim()
                 .toLowerCase(Locale.ROOT);
 
-        /*
-         * NPC pode selecionar:
-         * - default
-         * - estilos que começam por npc_
-         */
+
         if ("npc".equals(role)) {
             if (BubbleStyle.DEFAULT.getId().equals(
                     requestedStyleId
@@ -105,11 +98,6 @@ public class UpdateColorPacket {
             return BubbleStyle.DEFAULT.getId();
         }
 
-        /*
-         * Children pode selecionar:
-         * - default
-         * - estilos que começam por children_
-         */
         if ("children".equals(role)) {
             if (BubbleStyle.DEFAULT.getId().equals(
                     requestedStyleId
@@ -120,10 +108,6 @@ public class UpdateColorPacket {
             return BubbleStyle.DEFAULT.getId();
         }
 
-        /*
-         * Sem role especial:
-         * sempre usa a bolha colorida padrão.
-         */
         return BubbleStyle.DEFAULT.getId();
     }
 

@@ -52,17 +52,14 @@ public class ClientForgeEvents {
     private static final int MAX_TEXT_WIDTH = 150;
 
     private static final float DEFAULT_BUBBLE_SCALE = 0.025F;
-    private static final float TEXTURED_BUBBLE_SCALE = 0.016F;
+    private static final float TEXTURED_BUBBLE_SCALE = 0.020F;
 
-    private static final float TEXTURED_HEIGHT_OFFSET = 1.50F;
+    private static final float TEXTURED_HEIGHT_OFFSET = 1.3F;
     private static final float DEFAULT_HEIGHT_OFFSET = 0.75F;
 
-    private static final float DEFAULT_PADDING_X = 5.0F;
-    private static final float DEFAULT_PADDING_Y = 2.0F;
-    private static final float DEFAULT_MIN_WIDTH = 12.0F;
-
-    private static final float TOP_WIDTH = 80.0F;
-    private static final float TOP_HEIGHT = 16.0F;
+    private static final float DEFAULT_PADDING_X = 9.0F;
+    private static final float DEFAULT_PADDING_Y = 4.0F;
+    private static final float DEFAULT_MIN_WIDTH = 24.0F;
 
     private static final float TAIL_WIDTH = 16.0F;
     private static final float TAIL_HEIGHT = 8.0F;
@@ -308,14 +305,25 @@ public class ClientForgeEvents {
             } else {
                 float panelX = -sharedWidth / 2.0F;
 
+                float topWidth = style.getTopWidth();
+                float topHeight = style.getTopHeight();
+
+                float topX = panelX
+                        + (sharedWidth - topWidth) * style.getTopAlign()
+                        + style.getTopOffsetX();
+
+                float topY = firstPanel.y
+                        - topHeight
+                        + TOP_INSET;
+
                 drawWholeTexture(
                         buffers,
                         matrix,
                         style.getTopTexture(),
-                        panelX + sharedWidth - TOP_WIDTH,
-                        firstPanel.y - TOP_HEIGHT + TOP_INSET,
-                        TOP_WIDTH,
-                        TOP_HEIGHT,
+                        topX,
+                        topY,
+                        topWidth,
+                        topHeight,
                         getAlphaMultiplier(firstPanel.bubble),
                         light
                 );

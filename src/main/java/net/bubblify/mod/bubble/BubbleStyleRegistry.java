@@ -1,8 +1,6 @@
 package net.bubblify.mod.bubble;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import net.bubblify.mod.BubblifyMod;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -23,11 +21,9 @@ import java.util.Optional;
 
 public final class BubbleStyleRegistry {
 
-    private static final String STYLE_DIRECTORY =
-            "bubble_styles";
+    private static final String STYLE_DIRECTORY = "bubble_styles";
 
-    private static final Gson GSON =
-            new Gson();
+    private static final Gson GSON = new Gson();
 
     private static final Map<String, BubbleStyle> STYLES =
             new LinkedHashMap<>();
@@ -35,37 +31,24 @@ public final class BubbleStyleRegistry {
     private BubbleStyleRegistry() {
     }
 
-    /*
-     * Chamado no common setup e também antes de descobrir estilos
-     * do resource pack. É seguro em servidor dedicado porque não
-     * acessa Minecraft.getInstance() nem classes client-only.
-     */
     public static void registerDefaults() {
         STYLES.clear();
-
-        register(
-                BubbleStyle.DEFAULT
-        );
+        register(BubbleStyle.DEFAULT);
     }
 
-    public static void register(
-            BubbleStyle style
-    ) {
+    public static void register(BubbleStyle style) {
         if (style == null) {
             return;
         }
 
-        String id =
-                BubbleStyle.normalizeId(
-                        style.getId()
-                );
+        String id = BubbleStyle.normalizeId(
+                style.getId()
+        );
 
         STYLES.put(id, style);
     }
 
-    public static BubbleStyle getOrDefault(
-            String styleId
-    ) {
+    public static BubbleStyle getOrDefault(String styleId) {
         if (styleId == null || styleId.isBlank()) {
             return BubbleStyle.DEFAULT;
         }
@@ -76,9 +59,7 @@ public final class BubbleStyleRegistry {
         );
     }
 
-    public static boolean contains(
-            String styleId
-    ) {
+    public static boolean contains(String styleId) {
         if (styleId == null || styleId.isBlank()) {
             return false;
         }
@@ -90,17 +71,14 @@ public final class BubbleStyleRegistry {
 
     public static Collection<BubbleStyle> getAllStyles() {
         return Collections.unmodifiableList(
-                new ArrayList<>(
-                        STYLES.values()
-                )
+                new ArrayList<>(STYLES.values())
         );
     }
 
     public static List<BubbleStyle> getStylesByCategory(
             BubbleStyle.Category category
     ) {
-        List<BubbleStyle> result =
-                new ArrayList<>();
+        List<BubbleStyle> result = new ArrayList<>();
 
         for (BubbleStyle style : STYLES.values()) {
             if (style.getCategory() == category) {
@@ -111,12 +89,6 @@ public final class BubbleStyleRegistry {
         return Collections.unmodifiableList(result);
     }
 
-    /*
-     * Descobre style.json em todos os resource packs ativos.
-     *
-     * Exemplo de caminho:
-     * assets/bubblifymod/bubble_styles/ocean_turtle/style.json
-     */
     public static void discoverAndRegisterStyles(
             ResourceManager resourceManager
     ) {
@@ -127,8 +99,7 @@ public final class BubbleStyleRegistry {
         Map<ResourceLocation, Resource> foundStyles =
                 resourceManager.listResources(
                         STYLE_DIRECTORY,
-                        path -> path.getPath()
-                                .endsWith("/style.json")
+                        path -> path.getPath().endsWith("/style.json")
                 );
 
         int loadedStyles = 0;
@@ -137,12 +108,11 @@ public final class BubbleStyleRegistry {
                 : foundStyles.entrySet()) {
 
             try {
-                BubbleStyle style =
-                        loadStyle(
-                                resourceManager,
-                                entry.getKey(),
-                                entry.getValue()
-                        );
+                BubbleStyle style = loadStyle(
+                        resourceManager,
+                        entry.getKey(),
+                        entry.getValue()
+                );
 
                 if (style == null) {
                     continue;
@@ -179,17 +149,14 @@ public final class BubbleStyleRegistry {
     ) throws IOException {
         BubbleStyleDefinition definition;
 
-        try (Reader reader =
-                     new InputStreamReader(
-                             definitionResource.open(),
-                             StandardCharsets.UTF_8
-                     )) {
-
-            definition =
-                    GSON.fromJson(
-                            reader,
-                            BubbleStyleDefinition.class
-                    );
+        try (Reader reader = new InputStreamReader(
+                definitionResource.open(),
+                StandardCharsets.UTF_8
+        )) {
+            definition = GSON.fromJson(
+                    reader,
+                    BubbleStyleDefinition.class
+            );
         }
 
         validateDefinition(
@@ -197,36 +164,31 @@ public final class BubbleStyleRegistry {
                 definitionLocation
         );
 
-        String styleId =
-                BubbleStyle.normalizeId(
-                        definition.id
-                );
+        String styleId = BubbleStyle.normalizeId(
+                definition.id
+        );
 
-        String styleDirectory =
-                getParentDirectory(
-                        definitionLocation.getPath()
-                );
+        String styleDirectory = getParentDirectory(
+                definitionLocation.getPath()
+        );
 
-        ResourceLocation topLocation =
-                createPartLocation(
-                        definitionLocation.getNamespace(),
-                        styleDirectory,
-                        definition.top
-                );
+        ResourceLocation topLocation = createPartLocation(
+                definitionLocation.getNamespace(),
+                styleDirectory,
+                definition.top
+        );
 
-        ResourceLocation bodyLocation =
-                createPartLocation(
-                        definitionLocation.getNamespace(),
-                        styleDirectory,
-                        definition.body
-                );
+        ResourceLocation bodyLocation = createPartLocation(
+                definitionLocation.getNamespace(),
+                styleDirectory,
+                definition.body
+        );
 
-        ResourceLocation tailLocation =
-                createPartLocation(
-                        definitionLocation.getNamespace(),
-                        styleDirectory,
-                        definition.tail
-                );
+        ResourceLocation tailLocation = createPartLocation(
+                definitionLocation.getNamespace(),
+                styleDirectory,
+                definition.tail
+        );
 
         ensureResourceExists(
                 resourceManager,
@@ -246,10 +208,9 @@ public final class BubbleStyleRegistry {
                 "tail"
         );
 
-        BubbleStyle.Category category =
-                parseCategory(
-                        definition.category
-                );
+        BubbleStyle.Category category = parseCategory(
+                definition.category
+        );
 
         String displayName =
                 definition.displayName == null
@@ -276,7 +237,10 @@ public final class BubbleStyleRegistry {
                 definition.paddingRight,
                 definition.paddingTop,
                 definition.paddingBottom,
-                definition.heightOffset
+                definition.heightOffset,
+                definition.topWidth,
+                definition.topAlign,
+                definition.topOffsetX
         );
     }
 
@@ -291,8 +255,7 @@ public final class BubbleStyleRegistry {
             );
         }
 
-        if (definition.id == null
-                || definition.id.isBlank()) {
+        if (definition.id == null || definition.id.isBlank()) {
             throw new IllegalArgumentException(
                     "Campo obrigatório ausente: id."
             );
@@ -306,20 +269,9 @@ public final class BubbleStyleRegistry {
             );
         }
 
-        validateFileName(
-                definition.top,
-                "top"
-        );
-
-        validateFileName(
-                definition.body,
-                "body"
-        );
-
-        validateFileName(
-                definition.tail,
-                "tail"
-        );
+        validateFileName(definition.top, "top");
+        validateFileName(definition.body, "body");
+        validateFileName(definition.tail, "tail");
 
         if (definition.sourceWidth <= 0.0F) {
             throw new IllegalArgumentException(
@@ -327,9 +279,30 @@ public final class BubbleStyleRegistry {
             );
         }
 
+        if (!Float.isFinite(definition.topWidth)
+                || definition.topWidth <= 0.0F) {
+            throw new IllegalArgumentException(
+                    "topWidth deve ser um número finito maior que zero."
+            );
+        }
+
         if (definition.topHeight <= 0.0F) {
             throw new IllegalArgumentException(
                     "topHeight deve ser maior que zero."
+            );
+        }
+
+        if (!Float.isFinite(definition.topAlign)
+                || definition.topAlign < 0.0F
+                || definition.topAlign > 1.0F) {
+            throw new IllegalArgumentException(
+                    "topAlign deve estar entre 0.0 e 1.0."
+            );
+        }
+
+        if (!Float.isFinite(definition.topOffsetX)) {
+            throw new IllegalArgumentException(
+                    "topOffsetX deve ser um número finito."
             );
         }
 
@@ -358,8 +331,7 @@ public final class BubbleStyleRegistry {
             );
         }
 
-        if (definition.leftSlice
-                + definition.rightSlice
+        if (definition.leftSlice + definition.rightSlice
                 >= definition.sourceWidth) {
             throw new IllegalArgumentException(
                     "leftSlice + rightSlice deve ser menor"
@@ -368,10 +340,6 @@ public final class BubbleStyleRegistry {
         }
     }
 
-    /*
-     * Protege contra '../', caminhos absolutos e arquivos externos.
-     * Cada imagem deve permanecer na pasta do estilo.
-     */
     private static void validateFileName(
             String fileName,
             String fieldName
@@ -404,20 +372,14 @@ public final class BubbleStyleRegistry {
         }
     }
 
-    private static String getParentDirectory(
-            String path
-    ) {
-        int lastSlash =
-                path.lastIndexOf('/');
+    private static String getParentDirectory(String path) {
+        int lastSlash = path.lastIndexOf('/');
 
         if (lastSlash < 0) {
             return "";
         }
 
-        return path.substring(
-                0,
-                lastSlash
-        );
+        return path.substring(0, lastSlash);
     }
 
     private static ResourceLocation createPartLocation(
@@ -425,12 +387,9 @@ public final class BubbleStyleRegistry {
             String styleDirectory,
             String fileName
     ) {
-        String fullPath =
-                styleDirectory.isEmpty()
-                        ? fileName
-                        : styleDirectory
-                          + "/"
-                          + fileName;
+        String fullPath = styleDirectory.isEmpty()
+                ? fileName
+                : styleDirectory + "/" + fileName;
 
         return ResourceLocation.fromNamespaceAndPath(
                 namespace,
@@ -469,7 +428,8 @@ public final class BubbleStyleRegistry {
             );
         } catch (IllegalArgumentException exception) {
             throw new IllegalArgumentException(
-                    "Categoria inválida: '" + value
+                    "Categoria inválida: '"
+                            + value
                             + "'. Use DEFAULT, ADMIN, NPC ou CHILDREN.",
                     exception
             );
