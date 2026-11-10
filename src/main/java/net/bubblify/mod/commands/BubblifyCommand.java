@@ -1,4 +1,4 @@
-package net.bubblify.mod.commands; // Ajuste para o seu pacote!
+package net.bubblify.mod.commands; 
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
