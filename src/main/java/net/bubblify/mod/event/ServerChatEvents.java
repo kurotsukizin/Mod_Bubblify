@@ -22,12 +22,7 @@ import java.util.UUID;
 )
 public class ServerChatEvents {
 
-    /*
-     * Chaves persistentes usadas no player.getPersistentData().
-     *
-     * BubblifyCommand já usa STYLE_KEY, por isso ela precisa
-     * existir publicamente nesta classe.
-     */
+
     public static final String COLOR_KEY =
             "bubblify_chat_color";
 
@@ -198,12 +193,6 @@ public class ServerChatEvents {
         );
     }
 
-    /*
-     * Chamado por UpdateColorPacket.
-     *
-     * O servidor salva a aparência depois de validar
-     * estilo, role e permissões.
-     */
     public static void savePlayerPreferences(
             ServerPlayer player,
             int color,
@@ -254,27 +243,7 @@ public class ServerChatEvents {
         );
     }
 
-    /*
-     * Regra de acesso aos estilos:
-     *
-     * Admin/op nível 2 ou maior:
-     * - qualquer ID válido.
-     *
-     * NPC:
-     * - default
-     * - npc_*.png
-     *
-     * Children:
-     * - default
-     * - children_*.png
-     *
-     * Jogador comum:
-     * - somente default.
-     *
-     * A existência da textura é validada no cliente,
-     * pois as texturas são descobertas no ResourceManager
-     * do cliente/resource pack.
-     */
+
     public static String resolveAllowedStyle(
             ServerPlayer player,
             String requestedStyleId
