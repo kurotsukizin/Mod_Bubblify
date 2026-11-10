@@ -52,10 +52,6 @@ public class ColorPickerScreen extends Screen {
             this.selectedStyle = BubbleStyle.DEFAULT;
         }
 
-        /*
-         * Caso o jogador comum tenha ficado com algum estilo
-         * especial salvo localmente, força default.
-         */
         if (!BubbleStyleClientData.isStyleAllowed(
                 this.selectedStyle
         )) {
@@ -84,10 +80,6 @@ public class ColorPickerScreen extends Screen {
 
         updateColorPreview();
 
-        /*
-         * Nunca permite que a tela comece em Style
-         * para quem não recebeu a permissão.
-         */
         if (this.currentTab == Tab.STYLE
                 && !BubbleStyleClientData.canUseStyleTab()) {
             this.currentTab = Tab.COLOR;
@@ -112,10 +104,7 @@ public class ColorPickerScreen extends Screen {
     private void addTabButtons(int centerX) {
         int tabY = 35;
 
-        /*
-         * Para jogadores comuns, Color fica centralizado.
-         * Para quem pode usar Style, os dois botões aparecem.
-         */
+
         int colorTabX =
                 BubbleStyleClientData.canUseStyleTab()
                         ? centerX - 105
@@ -171,12 +160,7 @@ public class ColorPickerScreen extends Screen {
     }
 
     private void initStyleTab(int centerX) {
-        /*
-         * Lista somente os IDs permitidos pelo servidor.
-         *
-         * O registry continua importante porque o cliente só
-         * consegue criar BubbleStyle para texturas que ele possui.
-         */
+   
         List<BubbleStyle> allowedStyles =
                 BubbleStyleClientData.getAllowedStyles();
 
