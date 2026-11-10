@@ -15,35 +15,14 @@ public final class BubbleStyleClientData {
     private static final String DEFAULT_STYLE_ID =
             BubbleStyle.DEFAULT.getId();
 
-    /*
-     * IDs enviados e autorizados pelo servidor para o jogador atual.
-     *
-     * Exemplo de jogador comum:
-     * ["default"]
-     *
-     * Exemplo de NPC:
-     * ["default", "npc_guard", "npc_royal"]
-     *
-     * Exemplo de Children:
-     * ["default", "children_cloud", "children_star"]
-     *
-     * Exemplo de admin:
-     * ["default", "npc_guard", "children_star", ...]
-     */
+ 
     private static final Set<String> ALLOWED_STYLE_IDS =
             new LinkedHashSet<>();
 
-    /*
-     * Define se a aba Style aparece no menu.
-     *
-     * O padrão é false para que, antes de o servidor informar
-     * permissões, jogadores comuns tenham somente a aba Color.
-     */
+ 
     private static boolean styleTabAllowed = false;
 
-    /*
-     * Seleção atual no cliente.
-     */
+ 
     private static BubbleStyle selectedStyle =
             BubbleStyle.DEFAULT;
 
@@ -79,21 +58,8 @@ public final class BubbleStyleClientData {
         return styleTabAllowed;
     }
 
-    /*
-     * Método usado pelo AllowedBubbleStylesPacket.
-     *
-     * Como o pacote atual aparentemente transmite apenas
-     * List<String>, a aba Style é liberada quando a lista
-     * recebida contém pelo menos um ID além de "default".
-     *
-     * Lista ["default"]:
-     * - jogador normal
-     * - aba Style escondida
-     *
-     * Lista ["default", "children_star"]:
-     * - role Children ou admin
-     * - aba Style visível
-     */
+yle visível
+
     public static void setAllowedStyleIds(
             List<String> allowedStyleIds
     ) {
@@ -121,10 +87,7 @@ public final class BubbleStyleClientData {
         );
     }
 
-    /*
-     * Versão mais completa para um futuro pacote que envie
-     * diretamente a flag da aba Style.
-     */
+
     public static void setServerPermissions(
             boolean canUseStyleTab,
             List<String> allowedStyleIds
@@ -133,10 +96,7 @@ public final class BubbleStyleClientData {
 
         ALLOWED_STYLE_IDS.clear();
 
-        /*
-         * Default existe para todos, mesmo quando o servidor
-         * acidentalmente não o inclui na lista.
-         */
+
         ALLOWED_STYLE_IDS.add(DEFAULT_STYLE_ID);
 
         if (allowedStyleIds != null) {
@@ -148,11 +108,7 @@ public final class BubbleStyleClientData {
                     continue;
                 }
 
-                /*
-                 * A lista vinda do servidor define a permissão.
-                 * O registry garante que o cliente conhece
-                 * a textura/estilo antes de mostrar o botão.
-                 */
+        
                 if (DEFAULT_STYLE_ID.equals(normalizedId)
                         || BubbleStyleRegistry.contains(
                         normalizedId
@@ -162,31 +118,19 @@ public final class BubbleStyleClientData {
             }
         }
 
-        /*
-         * Sem permissão para Style, não conserva uma textura
-         * especial que tenha ficado salva localmente.
-         */
+
         if (!styleTabAllowed) {
             selectedStyle = BubbleStyle.DEFAULT;
             return;
         }
 
-        /*
-         * Caso o servidor tenha removido a permissão do estilo
-         * selecionado atualmente, retorna para o padrão.
-         */
+
         if (!isStyleAllowed(selectedStyle)) {
             selectedStyle = BubbleStyle.DEFAULT;
         }
     }
 
-    /*
-     * Útil apenas enquanto você está testando localmente
-     * no runClient e não terminou o pacote de permissões.
-     *
-     * Não deixe sendo chamado em servidor real: permissões
-     * precisam vir do servidor pelo AllowedBubbleStylesPacket.
-     */
+
     public static void enableLocalStyleTest() {
         List<String> ids = new ArrayList<>();
 
@@ -212,15 +156,10 @@ public final class BubbleStyleClientData {
         List<BubbleStyle> styles =
                 new ArrayList<>();
 
-        /*
-         * Default vem sempre em primeiro lugar.
-         */
+
         styles.add(BubbleStyle.DEFAULT);
 
-        /*
-         * Sem acesso à aba Style:
-         * a lista retorna apenas Default.
-         */
+ 
         if (!styleTabAllowed) {
             return Collections.unmodifiableList(styles);
         }
@@ -273,24 +212,17 @@ public final class BubbleStyleClientData {
             return false;
         }
 
-        /*
-         * Todo jogador pode usar a bolha colorida Default.
-         */
+
         if (DEFAULT_STYLE_ID.equals(normalizedId)) {
             return true;
         }
 
-        /*
-         * Jogador sem acesso à aba Style só pode usar Default.
-         */
+
         if (!styleTabAllowed) {
             return false;
         }
 
-        /*
-         * Além da permissão do servidor, exige que o estilo
-         * tenha sido registrado localmente a partir de um PNG.
-         */
+
         return ALLOWED_STYLE_IDS.contains(normalizedId)
                 && BubbleStyleRegistry.contains(normalizedId);
     }
